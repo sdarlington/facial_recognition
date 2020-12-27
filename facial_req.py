@@ -9,6 +9,14 @@ import pickle
 import time
 import cv2
 
+# Christmas Tree
+from christmastree import ChristmasTree
+from gpiozero.tools import random_values
+
+tree = ChristmasTree(pwm=True)
+leds = tree.leds
+
+
 #Initialize 'currentname' to trigger only when a new person is identified.
 currentname = "unknown"
 #Determine faces from encodings.pickle file model created from train_model.py
@@ -58,6 +66,9 @@ while True:
 	names = []
 
 	# loop over the facial embeddings
+	if len(encodings) == 0:
+		tree.off()
+        
 	for encoding in encodings:
 		# attempt to match each face in the input image to our known
 		# encodings
@@ -67,6 +78,9 @@ while True:
 
 		# check to see if we have found a match
 		if True in matches:
+			# if we recognise somone, turn on the tree
+			tree.on()
+			
 			# find the indexes of all matched faces then initialize a
 			# dictionary to count the total number of times each face
 			# was matched
@@ -88,7 +102,11 @@ while True:
 			if currentname != name:
 				currentname = name
 				print(currentname)
-		
+		else:
+			# turn off LEDS
+			print ("No matches")
+			tree.off()
+					
 		# update the list of names
 		names.append(name)
 
